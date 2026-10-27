@@ -1,0 +1,79 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    name: Redmine ${{ matrix.redmine }} / ${{ matrix.db }} / ruby ${{ matrix.ruby }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        redmine: ['7.0.2']
+        ruby: ['3.4']
+        db: ['sqlite3', 'postgresql']
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: redmine_test
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Redmine
+        uses: actions/checkout@v6
+        with:
+          repository: redmine/redmine
+          ref: ${{ matrix.redmine }}
+          path: redmine
+
+      - name: Checkout plugin
+        uses: actions/checkout@v6
+        with:
+          path: redmine/plugins/redmine_kanban
+
+      - name: Configure database
+        working-directory: redmine
+        run: |
+          if [ "${{ matrix.db }}" = "sqlite3" ]; then
+            printf 'test:\n  adapter: sqlite3\n  database: db/test.sqlite3\n' > config/database.yml
+          else
+            printf 'test:\n  adapter: postgresql\n  database: redmine_test\n  username: root\n  password: root\n  host: 127.0.0.1\n' > config/database.yml
+          fi
+
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+          working-directory: redmine
+        env:
+          BUNDLE_WITHOUT: development
+
+      - name: Prepare database
+        working-directory: redmine
+        env:
+          RAILS_ENV: test
+          BUNDLE_WITHOUT: development
+        run: |
+          bundle exec rake generate_secret_token
+          bundle exec rake db:create db:migrate redmine:plugins:migrate
+
+      - name: Run plugin tests
+        working-directory: redmine
+        env:
+          RAILS_ENV: test
+          BUNDLE_WITHOUT: development
+        run: bundle exec rake redmine:plugins:test NAME=redmine_kanban

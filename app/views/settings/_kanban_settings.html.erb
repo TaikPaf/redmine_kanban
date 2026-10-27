@@ -1,0 +1,25 @@
+<% card_fields = Array(@settings['card_fields']) %>
+<p class="info"><%= l(:text_kanban_plugin_settings_help) %></p>
+<p>
+  <label for="settings_swimlane"><%= l(:label_kanban_default_swimlane) %></label>
+  <%= select_tag 'settings[swimlane]', options_for_select(KanbanBoardSetting::SWIMLANES.map {|s| [l(KanbanHelper::SWIMLANE_LABELS[s]), s]}, @settings['swimlane']), id: 'settings_swimlane' %>
+</p>
+<p>
+  <label for="settings_closed_days"><%= l(:label_kanban_closed_days) %></label>
+  <%= number_field_tag 'settings[closed_days]', @settings['closed_days'], min: 0, id: 'settings_closed_days' %>
+  <em class="info"><%= l(:text_kanban_closed_days_help) %></em>
+</p>
+<p>
+  <label for="settings_max_cards"><%= l(:label_kanban_max_cards) %></label>
+  <%= number_field_tag 'settings[max_cards]', @settings['max_cards'], min: 1, id: 'settings_max_cards' %>
+</p>
+<p>
+  <label><%= l(:label_kanban_card_fields) %></label>
+  <%= hidden_field_tag 'settings[card_fields][]', '', id: nil %>
+  <% KanbanBoardSetting::CARD_FIELDS.each do |field| %>
+    <label class="block">
+      <%= check_box_tag 'settings[card_fields][]', field, card_fields.include?(field), id: nil %>
+      <%= l(KanbanHelper::CARD_FIELD_LABELS[field]) %>
+    </label>
+  <% end %>
+</p>

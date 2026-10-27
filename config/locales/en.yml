@@ -1,0 +1,37 @@
+en:
+  label_kanban: Kanban
+  project_module_kanban: Kanban
+  permission_view_kanban: View Kanban board
+  permission_rank_kanban_cards: Reorder Kanban cards
+  permission_manage_kanban: Configure Kanban board
+
+  label_kanban_swimlanes: Swimlanes
+  label_kanban_no_swimlane: None
+  label_kanban_unassigned: Unassigned
+  label_kanban_no_version: No version
+  label_kanban_no_category: No category
+  label_kanban_no_parent: No parent task
+  label_kanban_blocked: Blocked by an open issue
+  label_kanban_blocked_indicator: Blocked indicator
+  label_kanban_collapse: Collapse / expand
+  label_kanban_wip_limit: WIP limit
+  label_kanban_search_placeholder: "Search cards (#id, subject, assignee…)"
+  label_kanban_hide_empty_lanes: Hide empty swimlanes
+  label_kanban_refresh: Refresh
+  label_kanban_fullscreen: Full screen
+  label_kanban_open_issue: Open the issue
+  label_kanban_columns: Columns
+  label_kanban_column_enabled: Shown
+  label_kanban_display: Display
+  label_kanban_default_swimlane: Default swimlanes
+  label_kanban_closed_days: Closed issues shown (days)
+  label_kanban_max_cards: Maximum number of cards
+  label_kanban_card_fields: Card fields
+
+  text_kanban_truncated: "Only the first %{count} issues are displayed. Use the filters to narrow down the board."
+  text_kanban_columns_help: "Each column is an issue status. Drag the rows to reorder the columns. Leave every status unchecked to use the statuses of the project's workflows. A WIP limit of 0 means no limit."
+  text_kanban_closed_days_help: "Closed issues are only shown if they were closed during this period. 0 shows all closed issues."
+  text_kanban_plugin_settings_help: "Default values, used by the cross-project board and by projects that have not saved their own Kanban settings."
+
+  error_kanban_move_failed: The card could not be moved.
+  error_kanban_move_not_allowed: "This move is not allowed by the workflow or by your permissions."

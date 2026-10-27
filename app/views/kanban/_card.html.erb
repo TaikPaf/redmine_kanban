@@ -1,0 +1,61 @@
+<% fields = board.card_fields %>
+<div id="kanban-card-<%= issue.id %>"
+     class="kanban-card hascontextmenu <%= issue.css_classes %> <%= 'kanban-blocked' if board.blocked?(issue) %> <%= 'kanban-draggable' if board.draggable?(issue) %>"
+     data-id="<%= issue.id %>"
+     data-lock-version="<%= issue.lock_version %>"
+     data-status-id="<%= issue.status_id %>"
+     data-estimated-hours="<%= issue.estimated_hours.to_f %>"
+     data-editable="<%= board.editable?(issue) ? 1 : 0 %>"
+     data-rankable="<%= board.rankable?(issue) ? 1 : 0 %>"
+     data-search="<%= "##{issue.id} #{issue.subject} #{issue.assigned_to} #{issue.tracker}".downcase %>"
+     data-allowed-url="<%= kanban_allowed_moves_path(issue) %>"
+     data-move-url="<%= kanban_move_path(issue) %>">
+  <%= check_box_tag 'ids[]', issue.id, false, id: nil, class: 'kanban-card-select' %>
+  <div class="kanban-card-header">
+    <%= link_to "##{issue.id}", issue_path(issue), class: 'kanban-card-id' %>
+    <% if fields.include?('tracker') %>
+      <span class="kanban-badge kanban-tracker"><%= issue.tracker %></span>
+    <% end %>
+    <% if fields.include?('priority') && issue.priority %>
+      <span class="kanban-badge kanban-priority <%= issue.priority.css_classes %>"><%= issue.priority %></span>
+    <% end %>
+    <% if board.blocked?(issue) %>
+      <span class="kanban-badge kanban-blocked-badge" title="<%= l(:label_kanban_blocked) %>"><%= sprite_icon('lock', l(:label_kanban_blocked)) %></span>
+    <% end %>
+    <span class="kanban-card-actions"><%= link_to_context_menu %></span>
+  </div>
+  <div class="kanban-card-subject"><%= link_to issue.subject, issue_path(issue) %></div>
+  <% if issue.project != board.project %>
+    <div class="kanban-card-project"><%= issue.project %></div>
+  <% end %>
+  <% meta = [] %>
+  <% meta << content_tag(:span, issue.fixed_version, class: 'kanban-meta-version', title: l(:field_fixed_version)) if fields.include?('fixed_version') && issue.fixed_version %>
+  <% meta << content_tag(:span, issue.category, class: 'kanban-meta-category', title: l(:field_category)) if fields.include?('category') && issue.category %>
+  <% meta << content_tag(:span, format_date(issue.start_date), class: 'kanban-meta-start', title: l(:field_start_date)) if fields.include?('start_date') && issue.start_date %>
+  <% meta << content_tag(:span, sprite_icon('time', format_date(issue.due_date)), class: "kanban-meta-due #{kanban_due_class(issue)}", title: l(:field_due_date)) if fields.include?('due_date') && issue.due_date %>
+  <% if fields.include?('estimated_hours') || fields.include?('spent_hours') %>
+    <% hours = [] %>
+    <% hours << kanban_hours(issue.spent_hours) if fields.include?('spent_hours') %>
+    <% hours << kanban_hours(issue.estimated_hours) if fields.include?('estimated_hours') && issue.estimated_hours %>
+    <% meta << content_tag(:span, "#{hours.join(' / ')} h", class: 'kanban-meta-hours', title: [(l(:label_spent_time) if fields.include?('spent_hours')), (l(:field_estimated_hours) if fields.include?('estimated_hours'))].compact.join(' / ')) if hours.any? %>
+  <% end %>
+  <% if (subtasks = board.subtasks(issue)) && subtasks[:total] > 0 %>
+    <% meta << content_tag(:span, "#{subtasks[:closed]}/#{subtasks[:total]}", class: 'kanban-meta-subtasks', title: l(:label_subtask_plural)) %>
+  <% end %>
+  <% if meta.any? %>
+    <div class="kanban-card-meta"><%= safe_join(meta) %></div>
+  <% end %>
+  <% if fields.include?('done_ratio') && issue.done_ratio.to_i > 0 %>
+    <div class="kanban-progress" title="<%= l(:field_done_ratio) %>: <%= issue.done_ratio %>%"><span style="width: <%= issue.done_ratio.to_i %>%"></span></div>
+  <% end %>
+  <% if (fields.include?('assigned_to') && issue.assigned_to) || (fields.include?('author') && issue.author) %>
+    <div class="kanban-card-footer">
+      <% if fields.include?('author') && issue.author %>
+        <span class="kanban-author" title="<%= l(:field_author) %>"><%= avatar(issue.author, size: 16) %> <%= issue.author %></span>
+      <% end %>
+      <% if fields.include?('assigned_to') && issue.assigned_to %>
+        <span class="kanban-assignee" title="<%= l(:field_assigned_to) %>"><%= avatar(issue.assigned_to, size: 20) %> <%= issue.assigned_to %></span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

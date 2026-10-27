@@ -1,0 +1,64 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'kanban', plugin: 'redmine_kanban' %>
+  <%= javascript_include_tag 'kanban', plugin: 'redmine_kanban' %>
+<% end %>
+<% setting = KanbanBoardSetting.for_project(@project) %>
+<% enabled_ids = setting.statuses.map(&:id) %>
+<% ordered = setting.statuses + (IssueStatus.sorted.to_a - setting.statuses) %>
+
+<%= form_tag(project_kanban_settings_path(@project), method: :patch, id: 'kanban-settings-form') do %>
+<div class="box tabular">
+  <h3><%= l(:label_kanban_columns) %></h3>
+  <p class="info"><%= l(:text_kanban_columns_help) %></p>
+  <table class="list kanban-settings-columns">
+    <thead>
+      <tr>
+        <th></th>
+        <th><%= l(:label_kanban_column_enabled) %></th>
+        <th><%= l(:field_status) %></th>
+        <th><%= l(:label_kanban_wip_limit) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% ordered.each_with_index do |status, index| %>
+        <tr data-status-id="<%= status.id %>">
+          <td class="kanban-sort-handle"><%= sprite_icon('reorder', l(:label_sort)) %></td>
+          <td>
+            <%= hidden_field_tag "columns[#{status.id}][enabled]", '0', id: nil %>
+            <%= check_box_tag "columns[#{status.id}][enabled]", '1', enabled_ids.include?(status.id), id: "kanban_column_#{status.id}" %>
+            <%= hidden_field_tag "columns[#{status.id}][position]", index, class: 'kanban-position', id: nil %>
+          </td>
+          <td><label for="kanban_column_<%= status.id %>"><%= status.name %></label><%= " (#{l(:label_closed_issues)})" if status.is_closed? %></td>
+          <td><%= number_field_tag "columns[#{status.id}][wip_limit]", setting.wip_limit(status.id), min: 0, size: 4, id: nil, 'aria-label': l(:label_kanban_wip_limit) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <h3><%= l(:label_kanban_display) %></h3>
+  <p>
+    <label for="kanban_swimlane"><%= l(:label_kanban_default_swimlane) %></label>
+    <%= select_tag 'swimlane', options_for_select(KanbanBoardSetting::SWIMLANES.map {|s| [l(KanbanHelper::SWIMLANE_LABELS[s]), s]}, setting.swimlane), id: 'kanban_swimlane' %>
+  </p>
+  <p>
+    <label for="kanban_closed_days"><%= l(:label_kanban_closed_days) %></label>
+    <%= number_field_tag 'closed_days', setting.closed_days, min: 0, id: 'kanban_closed_days' %>
+    <em class="info"><%= l(:text_kanban_closed_days_help) %></em>
+  </p>
+  <p>
+    <label for="kanban_max_cards"><%= l(:label_kanban_max_cards) %></label>
+    <%= number_field_tag 'max_cards', setting.max_cards, min: 1, id: 'kanban_max_cards' %>
+  </p>
+  <p>
+    <label><%= l(:label_kanban_card_fields) %></label>
+    <%= hidden_field_tag 'card_fields[]', '', id: nil %>
+    <% KanbanBoardSetting::CARD_FIELDS.each do |field| %>
+      <label class="block">
+        <%= check_box_tag 'card_fields[]', field, setting.card_fields.include?(field), id: nil %>
+        <%= l(KanbanHelper::CARD_FIELD_LABELS[field]) %>
+      </label>
+    <% end %>
+  </p>
+</div>
+<%= submit_tag l(:button_save) %>
+<% end %>

@@ -1,0 +1,37 @@
+fr:
+  label_kanban: Kanban
+  project_module_kanban: Kanban
+  permission_view_kanban: Voir le tableau Kanban
+  permission_rank_kanban_cards: Réordonner les cartes Kanban
+  permission_manage_kanban: Configurer le tableau Kanban
+
+  label_kanban_swimlanes: Couloirs
+  label_kanban_no_swimlane: Aucun
+  label_kanban_unassigned: Non assigné
+  label_kanban_no_version: Aucune version
+  label_kanban_no_category: Aucune catégorie
+  label_kanban_no_parent: Sans tâche parente
+  label_kanban_blocked: Bloquée par une demande ouverte
+  label_kanban_blocked_indicator: Indicateur de blocage
+  label_kanban_collapse: Replier / déplier
+  label_kanban_wip_limit: Limite WIP
+  label_kanban_search_placeholder: "Rechercher (#id, sujet, assigné…)"
+  label_kanban_hide_empty_lanes: Masquer les couloirs vides
+  label_kanban_refresh: Rafraîchir
+  label_kanban_fullscreen: Plein écran
+  label_kanban_open_issue: Ouvrir la demande
+  label_kanban_columns: Colonnes
+  label_kanban_column_enabled: Affichée
+  label_kanban_display: Affichage
+  label_kanban_default_swimlane: Couloirs par défaut
+  label_kanban_closed_days: Demandes fermées affichées (jours)
+  label_kanban_max_cards: Nombre maximum de cartes
+  label_kanban_card_fields: Champs des cartes
+
+  text_kanban_truncated: "Seules les %{count} premières demandes sont affichées. Utilisez les filtres pour réduire le tableau."
+  text_kanban_columns_help: "Chaque colonne correspond à un statut. Faites glisser les lignes pour réordonner les colonnes. Si aucun statut n'est coché, ceux des workflows du projet sont utilisés. Une limite WIP de 0 signifie aucune limite."
+  text_kanban_closed_days_help: "Les demandes fermées ne sont affichées que si elles ont été fermées pendant cette période. 0 affiche toutes les demandes fermées."
+  text_kanban_plugin_settings_help: "Valeurs par défaut, utilisées par le tableau multi-projets et par les projets qui n'ont pas enregistré leurs propres réglages Kanban."
+
+  error_kanban_move_failed: La carte n'a pas pu être déplacée.
+  error_kanban_move_not_allowed: "Ce déplacement n'est pas autorisé par le workflow ou par vos permissions."

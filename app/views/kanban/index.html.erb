@@ -1,0 +1,69 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'kanban', plugin: 'redmine_kanban' %>
+  <%= javascript_include_tag 'kanban', plugin: 'redmine_kanban' %>
+<% end %>
+<%= context_menu %>
+
+<div class="contextual">
+  <% if User.current.allowed_to?(:add_issues, @project, global: true) && (@project.nil? || Issue.allowed_target_trackers(@project).any?) %>
+    <%= link_to sprite_icon('add', l(:label_issue_new)), _new_project_issue_path(@project), class: 'icon icon-add new-issue' %>
+  <% end %>
+  <%= link_to sprite_icon('list', l(:label_issue_plural)), _project_issues_path(@project, @query.as_params), class: 'icon icon-list' %>
+  <% if @project && User.current.allowed_to?(:manage_kanban, @project) %>
+    <%= link_to sprite_icon('settings', l(:label_settings)), settings_project_path(@project, tab: 'kanban'), class: 'icon icon-settings' %>
+  <% end %>
+</div>
+
+<h2><%= @query.new_record? ? l(:label_kanban) : "#{l(:label_kanban)} » #{@query.name}" %></h2>
+<% html_title(l(:label_kanban)) %>
+
+<%= form_tag(kanban_board_path(@project), method: :get, id: 'query_form') do %>
+  <%= hidden_field_tag 'set_filter', '1' %>
+  <div id="query_form_with_buttons" class="hide-when-print">
+    <div id="query_form_content">
+      <fieldset id="filters" class="collapsible <%= 'collapsed' unless @query.new_record? %>">
+        <legend onclick="toggleFieldset(this);" class="icon icon-<%= @query.new_record? ? 'expanded' : 'collapsed' %>">
+          <%= sprite_icon(@query.new_record? ? 'angle-down' : 'angle-right', rtl: !@query.new_record?) %>
+          <%= l(:label_filter_plural) %>
+        </legend>
+        <div style="<%= 'display: none;' unless @query.new_record? %>">
+          <%= render partial: 'queries/filters', locals: {query: @query} %>
+        </div>
+      </fieldset>
+    </div>
+    <div class="kanban-toolbar">
+      <label>
+        <%= l(:label_kanban_swimlanes) %>
+        <%= select_tag 'swimlane', kanban_swimlane_options(@board.swimlane), id: 'kanban-swimlane' %>
+      </label>
+      <% if @saved_queries.any? %>
+        <label>
+          <%= l(:label_query) %>
+          <%= select_tag 'kanban_saved_query',
+                         options_for_select([['', '']] + @saved_queries.map {|q| [q.name, q.id]}, @query.persisted? ? @query.id : nil),
+                         id: 'kanban-saved-query', data: {url: kanban_board_path(@project)} %>
+        </label>
+      <% end %>
+      <p class="buttons">
+        <%= link_to_function sprite_icon('checked', l(:button_apply)), '$("#query_form").submit()', class: 'icon icon-checked' %>
+        <%= link_to sprite_icon('reload', l(:button_clear)), kanban_board_path(@project, set_filter: 1), class: 'icon icon-reload' %>
+      </p>
+      <span class="kanban-toolbar-spacer"></span>
+      <input type="search" id="kanban-search" placeholder="<%= l(:label_kanban_search_placeholder) %>" aria-label="<%= l(:label_search) %>">
+      <label class="kanban-checkbox"><input type="checkbox" id="kanban-hide-empty-lanes" checked> <%= l(:label_kanban_hide_empty_lanes) %></label>
+      <button type="button" id="kanban-refresh" class="kanban-button" data-url="<%= kanban_board_path(@project) %>" title="<%= l(:label_kanban_refresh) %>"><%= sprite_icon('reload', l(:label_kanban_refresh), icon_only: true) %></button>
+      <button type="button" id="kanban-fullscreen" class="kanban-button" title="<%= l(:label_kanban_fullscreen) %>"><%= sprite_icon('maximize', l(:label_kanban_fullscreen), icon_only: true) %></button>
+    </div>
+  </div>
+<% end %>
+
+<%= error_messages_for @query %>
+<div id="kanban-flash" class="flash" style="display: none;" role="alert"></div>
+
+<div id="kanban-container"
+     data-i18n="<%= {
+       error: l(:error_kanban_move_failed),
+       open_issue: l(:label_kanban_open_issue)
+     }.to_json %>">
+  <%= render partial: 'kanban/board', locals: {board: @board} if @query.valid? %>
+</div>

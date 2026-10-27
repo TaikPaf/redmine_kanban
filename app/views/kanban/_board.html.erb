@@ -1,0 +1,51 @@
+<% if board.issues.nil? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<% if board.truncated? %>
+  <p class="warning kanban-truncated"><%= l(:text_kanban_truncated, count: board.setting.max_cards) %></p>
+<% end %>
+<%= form_tag({}, id: 'kanban-form', data: {cm_url: issues_context_menu_path}) do %>
+<div id="kanban-board"
+     class="kanban-board kanban-swimlane-<%= board.swimlane %>"
+     style="<%= kanban_column_style(board) %>"
+     data-lane-field="<%= board.lane_movable? ? board.swimlane : '' %>"
+     data-board-project-id="<%= board.project&.id %>"
+     data-storage-key="redmine_kanban:<%= board.project&.identifier || 'global' %>">
+  <div class="kanban-row kanban-header-row">
+    <% board.columns.each do |column| %>
+      <div class="kanban-column-header <%= 'kanban-over-limit' if column.over_limit? %> <%= 'kanban-closed-column' if column.status.is_closed? %>"
+           data-status-id="<%= column.status.id %>" data-wip-limit="<%= column.wip_limit %>">
+        <button type="button" class="kanban-column-toggle" title="<%= l(:label_kanban_collapse) %>"><%= sprite_icon('angle-left', l(:label_kanban_collapse), icon_only: true) %></button>
+        <span class="kanban-column-name"><%= column.status.name %></span>
+        <span class="kanban-column-count" title="<%= l(:label_kanban_wip_limit) %>">
+          <%= column.count %><% if column.wip_limit %> / <%= column.wip_limit %><% end %>
+        </span>
+        <span class="kanban-column-hours" title="<%= l(:field_estimated_hours) %>"><%= "#{kanban_hours(column.estimated_hours)} h" if column.estimated_hours > 0 %></span>
+      </div>
+    <% end %>
+  </div>
+  <% board.lanes.each do |lane| %>
+    <% lane_count = board.lane_count(lane) %>
+    <div class="kanban-lane <%= 'kanban-lane-empty' if lane_count.zero? %>" data-lane-id="<%= lane.id %>">
+      <% if board.swimlane != 'none' %>
+        <div class="kanban-lane-header">
+          <button type="button" class="kanban-lane-toggle"><%= sprite_icon('angle-down', l(:label_kanban_collapse), icon_only: true) %></button>
+          <%= kanban_lane_avatar(board, lane) %>
+          <span class="kanban-lane-name"><%= kanban_lane_name(board, lane) %></span>
+          <span class="kanban-lane-count"><%= lane_count %></span>
+        </div>
+      <% end %>
+      <div class="kanban-row kanban-cells">
+        <% board.statuses.each do |status| %>
+          <div class="kanban-cell" data-status-id="<%= status.id %>" data-lane-id="<%= lane.id %>">
+            <% board.cell(lane, status).each do |issue| %>
+              <%= render partial: 'kanban/card', locals: {issue: issue, board: board} %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+<% end %>
+<% end %>
