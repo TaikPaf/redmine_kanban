@@ -58,3 +58,23 @@ bundle exec rake redmine:plugins:test NAME=redmine_kanban RAILS_ENV=test
 ```
 
 Les tests tournent aussi automatiquement sur GitHub Actions (Redmine 7.0.2, SQLite et PostgreSQL).
+
+## Environnement de développement (Docker)
+
+Le dossier `dev/` lance un Redmine 7.0.2 local qui contient le plugin :
+
+```bash
+cd dev
+docker compose up -d redmine
+docker compose exec redmine bundle exec rails runner plugins/redmine_kanban/dev/seed.rb
+```
+
+Ouvrez ensuite http://localhost:3000/projects/demo/kanban (compte `admin` / `admin`, celui par défaut de Redmine, à n'utiliser qu'en local).
+Sous Windows, Redmine ne voit pas les modifications de fichiers : lancez `docker compose restart redmine` après chaque changement.
+
+Pour lancer les tests dans Docker :
+
+```bash
+cd dev
+docker compose --profile test run --rm test
+```

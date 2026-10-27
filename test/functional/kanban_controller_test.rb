@@ -103,8 +103,10 @@ class KanbanControllerTest < Redmine::ControllerTest
 
   def test_move_to_status_not_allowed_by_workflow
     issue = Issue.find(1)
-    forbidden = IssueStatus.where.not(id: issue.new_statuses_allowed_to(User.find(2)).map(&:id)).first
-    assert forbidden
+    forbidden = IssueStatus.where.not(id: issue.status_id).last
+    WorkflowTransition.where(tracker_id: issue.tracker_id, old_status_id: issue.status_id,
+                             new_status_id: forbidden.id).delete_all
+    assert_not_includes issue.new_statuses_allowed_to(User.find(2)), forbidden
     post :move, params: {id: 1, status_id: forbidden.id}, xhr: true
     assert_response :unprocessable_content
     assert_equal I18n.t(:error_kanban_move_not_allowed), response.parsed_body['error']

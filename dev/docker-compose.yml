@@ -1,0 +1,27 @@
+services:
+  redmine:
+    build: .
+    image: redmine-kanban-dev
+    command: sh -c "rm -f tmp/pids/server.pid && bundle exec rake db:migrate redmine:plugins:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
+    environment:
+      RAILS_ENV: development
+      REDMINE_SECRET_KEY_BASE: dev-only-secret
+    ports:
+      - "3000:3000"
+    volumes:
+      - ..:/usr/src/redmine/plugins/redmine_kanban
+      - sqlite:/usr/src/redmine/sqlite
+
+  test:
+    build: .
+    image: redmine-kanban-dev
+    profiles: [test]
+    environment:
+      RAILS_ENV: test
+      REDMINE_SECRET_KEY_BASE: test-only-secret
+    command: sh -c "bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate && bundle exec rake redmine:plugins:test NAME=redmine_kanban"
+    volumes:
+      - ..:/usr/src/redmine/plugins/redmine_kanban
+
+volumes:
+  sqlite:

@@ -7,9 +7,9 @@
 <% ordered = setting.statuses + (IssueStatus.sorted.to_a - setting.statuses) %>
 
 <%= form_tag(project_kanban_settings_path(@project), method: :patch, id: 'kanban-settings-form') do %>
-<div class="box tabular">
+<div class="box">
   <h3><%= l(:label_kanban_columns) %></h3>
-  <p class="info"><%= l(:text_kanban_columns_help) %></p>
+  <p><em class="info"><%= l(:text_kanban_columns_help) %></em></p>
   <table class="list kanban-settings-columns">
     <thead>
       <tr>
@@ -22,7 +22,7 @@
     <tbody>
       <% ordered.each_with_index do |status, index| %>
         <tr data-status-id="<%= status.id %>">
-          <td class="kanban-sort-handle"><%= sprite_icon('reorder', l(:label_sort)) %></td>
+          <td class="kanban-sort-handle" title="<%= l(:label_sort) %>"><%= sprite_icon('reorder', l(:label_sort), icon_only: true) %></td>
           <td>
             <%= hidden_field_tag "columns[#{status.id}][enabled]", '0', id: nil %>
             <%= check_box_tag "columns[#{status.id}][enabled]", '1', enabled_ids.include?(status.id), id: "kanban_column_#{status.id}" %>
@@ -34,7 +34,9 @@
       <% end %>
     </tbody>
   </table>
+</div>
 
+<div class="box tabular">
   <h3><%= l(:label_kanban_display) %></h3>
   <p>
     <label for="kanban_swimlane"><%= l(:label_kanban_default_swimlane) %></label>
