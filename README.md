@@ -78,3 +78,7 @@ Pour lancer les tests dans Docker :
 cd dev
 docker compose --profile test run --rm test
 ```
+
+## Licence
+
+GPL v2 ou ultérieure, comme Redmine. Voir le fichier `LICENSE`.
