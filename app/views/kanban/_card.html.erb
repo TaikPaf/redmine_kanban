@@ -12,11 +12,14 @@
      data-move-url="<%= kanban_move_path(issue) %>">
   <%= check_box_tag 'ids[]', issue.id, false, id: nil, class: 'kanban-card-select' %>
   <div class="kanban-card-header">
+    <% if fields.include?('priority') && issue.priority && defined?(RedmineWorkspace::Icons) %>
+      <%= RedmineWorkspace::Icons.priority(issue.priority, label: false) %>
+    <% end %>
     <%= link_to "##{issue.id}", issue_path(issue), class: 'kanban-card-id' %>
     <% if fields.include?('tracker') %>
       <span class="kanban-badge kanban-tracker"><%= issue.tracker %></span>
     <% end %>
-    <% if fields.include?('priority') && issue.priority %>
+    <% if fields.include?('priority') && issue.priority && !defined?(RedmineWorkspace::Icons) %>
       <span class="kanban-badge kanban-priority <%= issue.priority.css_classes %>"><%= issue.priority %></span>
     <% end %>
     <% if board.blocked?(issue) %>

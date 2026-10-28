@@ -16,6 +16,7 @@
       <div class="kanban-column-header <%= 'kanban-over-limit' if column.over_limit? %> <%= 'kanban-closed-column' if column.status.is_closed? %>"
            data-status-id="<%= column.status.id %>" data-wip-limit="<%= column.wip_limit %>">
         <button type="button" class="kanban-column-toggle" title="<%= l(:label_kanban_collapse) %>"><%= sprite_icon('angle-left', l(:label_kanban_collapse), icon_only: true) %></button>
+        <%= RedmineWorkspace::Icons.status(column.status, label: false) if defined?(RedmineWorkspace::Icons) %>
         <span class="kanban-column-name"><%= column.status.name %></span>
         <span class="kanban-column-count" title="<%= l(:label_kanban_wip_limit) %>">
           <%= column.count %><% if column.wip_limit %> / <%= column.wip_limit %><% end %>
