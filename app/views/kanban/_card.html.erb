@@ -25,7 +25,7 @@
     <% if board.blocked?(issue) %>
       <span class="kanban-badge kanban-blocked-badge" title="<%= l(:label_kanban_blocked) %>"><%= sprite_icon('lock', l(:label_kanban_blocked)) %></span>
     <% end %>
-    <span class="kanban-card-actions"><%= link_to_context_menu %></span>
+    <span class="kanban-card-actions"><%= RedmineWorkspace::Icons.peek_button(issue) if defined?(RedmineWorkspace::Icons) %><%= link_to_context_menu %></span>
   </div>
   <div class="kanban-card-subject"><%= link_to issue.subject, issue_path(issue) %></div>
   <% if issue.project != board.project %>
