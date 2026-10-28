@@ -153,6 +153,8 @@ html[data-gf-theme="dark"] { --kb-surface: var(--gf-surface-raised); }
   overflow-wrap: anywhere;
 }
 #kanban-board .kanban-card:hover { border-color: var(--kb-border-strong); }
+html[data-gf-density="compact"] #kanban-board .kanban-card { padding: 6px 8px; margin-bottom: 6px; }
+html[data-gf-density="compact"] .kanban-card-subject { margin: 2px 0 3px; }
 #kanban-board .kanban-card:focus-within { outline: 2px solid var(--kb-accent); outline-offset: 2px; }
 #kanban-board .kanban-card.kanban-draggable { cursor: grab; }
 #kanban-board .kanban-card.ui-sortable-helper { cursor: grabbing; box-shadow: 0 12px 32px rgba(16, 17, 20, .18); transform: rotate(1.5deg); }
